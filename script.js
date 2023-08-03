@@ -1,61 +1,205 @@
-const apiKey = 'b38fda99bfdc4b389743b7460b46853f';
+const searchInput = document.getElementById('searchInput');
+const searchButton = document.getElementById('searchButton');
+const resultContainer = document.getElementById('resultContainer');
 
-async function searchRecipes() {
-  const searchInput = document.getElementById('searchInput').value;
-  const url = `https://api.spoonacular.com/recipes/complexSearch?apiKey=${apiKey}&query=${searchInput}&number=3`;
+const API_URL = 'https://www.themealdb.com/api/json/v1/1/search.php';
 
-  try {
-    const response = await fetch(url);
-    const data = await response.json();
+searchButton.addEventListener('click', () => {
+    const searchTerm = searchInput.value.trim();
 
-    if (data && data.results && data.results.length > 0) {
-      displayRecipes(data.results);
-    } else {
-      console.error('Error fetching data: No recipes found for the given search keyword');
+    if (searchTerm !== '') {
+        fetch(`${API_URL}?s=${searchTerm}`)
+            .then((response) => response.json())
+            .then((data) => {
+                showMeals(data.meals);
+            })
+            .catch((error) => {
+                console.error('Error fetching data:', error);
+            });
     }
-  } catch (error) {
-    console.error('Error fetching data:', error);
-  }
+});
+
+function showMeals(meals) {
+    resultContainer.innerHTML = '';
+
+    if (meals === null) {
+        resultContainer.innerHTML = '<p>No results found.</p>';
+        return;
+    }
+
+    meals.forEach((meal) => {
+        const mealCard = createMealCard(meal);
+        resultContainer.appendChild(mealCard);
+    });
 }
 
-function displayRecipes(recipes) {
-  const resultsDiv = document.getElementById('results');
-  resultsDiv.innerHTML = '';
+function createMealCard(meal) {
+    const mealCard = document.createElement('div');
+    mealCard.classList.add('meal-card');
 
-  recipes.forEach((recipe) => {
-    const recipeDiv = document.createElement('div');
-    recipeDiv.className = 'recipe';
+    const image = document.createElement('img');
+    image.src = meal.strMealThumb;
+    image.alt = meal.strMeal;
 
-    const recipeTitle = document.createElement('h2');
-    recipeTitle.textContent = recipe.title;
-    recipeDiv.appendChild(recipeTitle);
+    const mealTitle = document.createElement('h3');
+    mealTitle.innerText = meal.strMeal;
 
-    const recipeImage = document.createElement('img');
-    recipeImage.src = recipe.image;
-    recipeImage.alt = recipe.title;
-    recipeDiv.appendChild(recipeImage);
+    const mealCategory = document.createElement('p');
+    mealCategory.innerText = `Category: ${meal.strCategory}`;
 
-    const ingredientsList = document.createElement('ul');
-    recipe.extendedIngredients.forEach((ingredient) => {
-      const ingredientLi = document.createElement('li');
-      ingredientLi.textContent = ingredient.original;
-      ingredientsList.appendChild(ingredientLi);
-    });
-    recipeDiv.appendChild(ingredientsList);
+    const mealInstructions = document.createElement('p');
+    mealInstructions.innerText = meal.strInstructions;
 
-    const timeNeeded = document.createElement('p');
-    timeNeeded.textContent = `Ready in ${recipe.readyInMinutes} minutes`;
-    recipeDiv.appendChild(timeNeeded);
+    mealCard.appendChild(image);
+    mealCard.appendChild(mealTitle);
+    mealCard.appendChild(mealCategory);
+    mealCard.appendChild(mealInstructions);
 
-    const instructionsLink = document.createElement('a');
-    instructionsLink.textContent = 'Instructions';
-    instructionsLink.href = recipe.sourceUrl;
-    instructionsLink.target = '_blank';
-    recipeDiv.appendChild(instructionsLink);
+    return mealCard;
+}// ... (previous code)
 
-    resultsDiv.appendChild(recipeDiv);
+searchButton.addEventListener('click', () => {
+  const searchTerm = searchInput.value.trim();
+
+  if (searchTerm !== '') {
+      fetch(`${API_URL}?s=${searchTerm}`)
+          .then((response) => response.json())
+          .then((data) => {
+              showMeals(data.meals);
+          })
+          .catch((error) => {
+              console.error('Error fetching data:', error);
+          });
+  }
+});
+
+function showMeals(meals) {
+  resultContainer.innerHTML = '';
+
+  if (meals === null) {
+      resultContainer.innerHTML = '<p>No results found.</p>';
+      return;
+  }
+
+  meals.forEach((meal) => {
+      const mealCard = createMealCard(meal);
+      resultContainer.appendChild(mealCard);
   });
 }
+
+function createMealCard(meal) {
+  const mealCard = document.createElement('div');
+  mealCard.classList.add('meal-card');
+
+  const image = document.createElement('img');
+  image.src = meal.strMealThumb;
+  image.alt = meal.strMeal;
+
+  const mealTitle = document.createElement('h3');
+  mealTitle.innerText = meal.strMeal;
+
+  const mealCategory = document.createElement('p');
+  mealCategory.innerText = `Category: ${meal.strCategory}`;
+
+  const mealTime = document.createElement('p');
+  mealTime.innerText = `Cooking Time: ${meal.strTime}`;
+
+  const ingredientsTitle = document.createElement('p');
+  ingredientsTitle.innerText = 'Ingredients:';
+
+  const ingredientList = document.createElement('ul');
+  for (let i = 1; i <= 20; i++) {
+      if (meal[`strIngredient${i}`]) {
+          const ingredientItem = document.createElement('li');
+          ingredientItem.innerText = `${meal[`strMeasure${i}`]} ${meal[`strIngredient${i}`]}`;
+          ingredientList.appendChild(ingredientItem);
+      }
+  }
+
+  const mealInstructions = document.createElement('p');
+  mealInstructions.innerText = `Instructions: ${meal.strInstructions}`;
+
+  mealCard.appendChild(image);
+  mealCard.appendChild(mealTitle);
+  mealCard.appendChild(mealCategory);
+  mealCard.appendChild(mealTime);
+  mealCard.appendChild(ingredientsTitle);
+  mealCard.appendChild(ingredientList);
+  mealCard.appendChild(mealInstructions);
+
+  return mealCard;
+}
+
+
+
+searchButton.addEventListener('click', performSearch);
+searchInput.addEventListener('keypress', function (event) {
+    if (event.key === 'Enter') {
+        performSearch();
+    }
+});
+
+function performSearch() {
+    const searchTerm = searchInput.value.trim();
+
+    if (searchTerm !== '') {
+        fetch(`${API_URL}?s=${searchTerm}`)
+            .then((response) => response.json())
+            .then((data) => {
+                showMeals(data.meals);
+            })
+            .catch((error) => {
+                console.error('Error fetching data:', error);
+            });
+    }
+}
+
+// ... (previous code)
+
+const emojiContainer = document.getElementById('animatedBackground');
+
+// List of food-related emojis
+const emojis = ['🍔', '🍕', '🌮', '🍩', '🍓', '🍦', '🍟', '🍗', '🥗', '🍪'];
+
+// Function to create and animate emojis
+function createEmoji() {
+  const emoji = document.createElement('span');
+  emoji.classList.add('emoji');
+  emoji.innerText = emojis[Math.floor(Math.random() * emojis.length)];
+
+  const containerWidth = emojiContainer.clientWidth;
+  const containerHeight = emojiContainer.clientHeight;
+
+  const startOffsetLeft = Math.random() * (containerWidth - 50);
+  const startOffsetTop = Math.random() * (containerHeight - 50);
+  emoji.style.left = `${startOffsetLeft}px`;
+  emoji.style.top = `${startOffsetTop}px`;
+
+  const fontSize = Math.floor(Math.random() * 24) + 18; // Random font size between 18px and 42px
+  emoji.style.fontSize = `${fontSize}px`;
+
+  const animationDuration = 5 + Math.random() * 5;
+  const animationDelay = Math.random() * 2;
+  emoji.style.animationDuration = `${animationDuration}s`;
+  emoji.style.animationDelay = `${animationDelay}s`;
+
+  emojiContainer.appendChild(emoji);
+
+  // Schedule the removal of the emoji after the fade-out animation completes
+  setTimeout(() => {
+      emojiContainer.removeChild(emoji);
+  }, (animationDuration + animationDelay) * 1000);
+}
+
+
+// Function to add emojis periodically
+function addEmojis() {
+    setInterval(createEmoji, 1000);
+}
+
+addEmojis();
+
+// ... (remaining code)
 
 
 

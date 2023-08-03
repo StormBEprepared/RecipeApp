@@ -1,22 +1,26 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Food API Application</title>
-  <link rel="stylesheet" type="text/css" href="styles.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Food API App</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <h1>Food API Application</h1>
-  <div>
-    <label for="searchInput">Enter a keyword:</label>
-    <input type="text" id="searchInput" placeholder="e.g., chicken">
-    <button onclick="searchRecipes()">Search</button>
-  </div>
-  <div id="results"></div>
+    <header>
+        <h1>Food API App</h1>
+    </header>
+    <main>
+      <div class="animated-background" id="animatedBackground"></div>
 
-  <script src="script.js"></script>
+        <div class="search-container">
+            <input type="text" id="searchInput" placeholder="Search for a meal...">
+            <button id="searchButton">Search</button>
+        </div>
+        <div class="result-container" id="resultContainer">
+            <!-- Results will be dynamically added here -->
+        </div>
+    </main>
+    <script src="script.js"></script>
 </body>
 </html>
-
-
-
-<!--https://spoonacular.com/food-api/console#Profile-->
